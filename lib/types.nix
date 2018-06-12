@@ -20,4 +20,19 @@ rec {
     check = test "([0-9A-Za-z._])[0-9A-Za-z._-]*";
     merge = mergeOneOption;
   };
+
+  # POSIX.1‐2013, 3.267 Pathname
+  pathname = mkOptionType {
+    name = "POSIX pathname";
+    check = x:
+      let
+        # The filter is used to normalize paths, i.e. to remove duplicated and
+        # trailing slashes.  It also removes leading slashes, thus we have to
+        # check for "/" explicitly below.
+        xs = filter (s: stringLength s > 0) (splitString "/" x);
+      in
+        isString x && (x == "/" || (length xs > 0 && all filename.check xs));
+    merge = mergeOneOption;
+  };
+
 }
