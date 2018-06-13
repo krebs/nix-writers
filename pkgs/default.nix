@@ -284,7 +284,7 @@ pkgs: oldpkgs: {
       ${pkgs.cabal2nix}/bin/cabal2nix ${path} > $out
     '');
 
-  writePython2 = deps:
+  writePython2 = name: deps:
   let
     py = pkgs.python2.withPackages(ps: attrVals deps ps);
   in
@@ -293,12 +293,12 @@ pkgs: oldpkgs: {
     check = pkgs.writeDash "python2check.sh" ''
       exec ${pkgs.python2Packages.flake8}/bin/flake8 --show-source "$1"
     '';
-  };
+  } name;
 
-  writePython2Bin = d: name:
-    pkgs.writePython2 d "/bin/${name}";
+  writePython2Bin = name:
+    pkgs.writePython2 "/bin/${name}";
 
-  writePython3 = deps:
+  writePython3 = name: deps:
   let
     py = pkgs.python3.withPackages(ps: attrVals deps ps);
   in
@@ -307,10 +307,10 @@ pkgs: oldpkgs: {
     check = pkgs.writeDash "python3check.sh" ''
       exec ${pkgs.python3Packages.flake8}/bin/flake8 --show-source "$1"
     '';
-  };
+  } name;
 
-  writePython3Bin = d: name:
-    pkgs.writePython3 d "/bin/${name}";
+  writePython3Bin = name:
+    pkgs.writePython3 "/bin/${name}";
 
   writeSed = pkgs.makeScriptWriter {
     interpreter = "${pkgs.gnused}/bin/sed -f";
