@@ -155,7 +155,7 @@ pkgs: oldpkgs: {
     mv "$textPath" $out
   '';
 
-  writeHaskell =
+  writeHaskellPackage =
     k:
     let
       k' = parseDrvName k;
