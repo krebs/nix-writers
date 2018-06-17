@@ -155,6 +155,21 @@ pkgs: oldpkgs: {
     mv "$textPath" $out
   '';
 
+  writeHaskell = name: extra-deps: text:
+    pkgs.stdenv.mkDerivation {
+      inherit name;
+      src = pkgs.writeHaskellPackage name {
+        executables.${name} = {
+          inherit extra-deps;
+          text = text;
+        };
+      };
+      phases = [ "buildPhase" ];
+      buildPhase = ''
+        ln -fns $src/bin/${name} $out
+      '';
+    };
+
   writeHaskellPackage =
     k:
     let
