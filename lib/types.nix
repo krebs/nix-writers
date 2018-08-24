@@ -1,6 +1,19 @@
 { lib, ... }:
 with lib;
 rec {
+
+  haskell.conid = mkOptionType {
+    name = "Haskell constructor identifier";
+    check = test "[[:upper:]][[:lower:]_[:upper:]0-9']*";
+    merge = mergeOneOption;
+  };
+
+  haskell.modid = mkOptionType {
+    name = "Haskell module identifier";
+    check = x: isString x && all haskell.conid.check (splitString "." x);
+    merge = mergeOneOption;
+  };
+
   # POSIX.1‐2013, 3.2 Absolute Pathname
   absolute-pathname = mkOptionType {
     name = "POSIX absolute pathname";
