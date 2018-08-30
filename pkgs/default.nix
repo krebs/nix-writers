@@ -299,28 +299,30 @@ pkgs: oldpkgs: {
       ${pkgs.cabal2nix}/bin/cabal2nix ${path} > $out
     '');
 
-  writePython2 = name: deps:
+  writePython2 = name: { deps ? [], flakeIgnore ? [] }:
   let
-    py = pkgs.python2.withPackages(ps: attrVals deps ps);
+    py = pkgs.python2.withPackages (ps: deps);
+    ignoreAttribute = lib.optionalString (ignore != []) "--ignore ${lib.concatMapStringsSep "," lib.escapeShellArg flakeIgnore}";
   in
   pkgs.makeScriptWriter {
     interpreter = "${py}/bin/python";
     check = pkgs.writeDash "python2check.sh" ''
-      exec ${pkgs.python2Packages.flake8}/bin/flake8 --show-source "$1"
+      exec ${pkgs.python2Packages.flake8}/bin/flake8 --show-source ${ignoreAttribute} "$1"
     '';
   } name;
 
   writePython2Bin = name:
     pkgs.writePython2 "/bin/${name}";
 
-  writePython3 = name: deps:
+  writePython3 = name: { deps ? [], flakeIgnore ? [] }:
   let
-    py = pkgs.python3.withPackages(ps: attrVals deps ps);
+    py = pkgs.python3.withPackages (ps: deps);
+    ignoreAttribute = lib.optionalString (ignore != []) "--ignore ${lib.concatMapStringsSep "," lib.escapeShellArg flakeIgnore}";
   in
   pkgs.makeScriptWriter {
     interpreter = "${py}/bin/python";
     check = pkgs.writeDash "python3check.sh" ''
-      exec ${pkgs.python3Packages.flake8}/bin/flake8 --show-source "$1"
+      exec ${pkgs.python3Packages.flake8}/bin/flake8 --show-source ${ignoreAttribute} "$1"
     '';
   } name;
 
