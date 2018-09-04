@@ -302,7 +302,7 @@ pkgs: oldpkgs: {
   writePython2 = name: { deps ? [], flakeIgnore ? [] }:
   let
     py = pkgs.python2.withPackages (ps: deps);
-    ignoreAttribute = lib.optionalString (ignore != []) "--ignore ${lib.concatMapStringsSep "," lib.escapeShellArg flakeIgnore}";
+    ignoreAttribute = optionalString (flakeIgnore != []) "--ignore ${concatMapStringsSep "," escapeShellArg flakeIgnore}";
   in
   pkgs.makeScriptWriter {
     interpreter = "${py}/bin/python";
@@ -317,7 +317,7 @@ pkgs: oldpkgs: {
   writePython3 = name: { deps ? [], flakeIgnore ? [] }:
   let
     py = pkgs.python3.withPackages (ps: deps);
-    ignoreAttribute = lib.optionalString (ignore != []) "--ignore ${lib.concatMapStringsSep "," lib.escapeShellArg flakeIgnore}";
+    ignoreAttribute = optionalString (flakeIgnore != []) "--ignore ${concatMapStringsSep "," escapeShellArg flakeIgnore}";
   in
   pkgs.makeScriptWriter {
     interpreter = "${py}/bin/python";
