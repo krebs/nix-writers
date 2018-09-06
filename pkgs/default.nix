@@ -121,18 +121,33 @@ pkgs: oldpkgs: {
     assert types.filename.check name;
     pkgs.writeBash "/bin/${name}";
 
-  writeC = name: { destination ? "" }: text: pkgs.runCommand name {
+  writeC = name: {
+    destination ? "",
+    libraries ? {}
+  }: text: pkgs.runCommand name {
     inherit text;
+    buildInputs = [ pkgs.pkgconfig ] ++ attrValues libraries;
     passAsFile = [ "text" ];
   } /* sh */ ''
     PATH=${makeBinPath [
       pkgs.binutils-unwrapped
       pkgs.coreutils
       pkgs.gcc
+      pkgs.pkgconfig
     ]}
     exe=$out${destination}
     mkdir -p "$(dirname "$exe")"
-    gcc -O -Wall -o "$exe" -x c "$textPath"
+    gcc \
+        ${optionalString (libraries != [])
+          /* sh */ "$(pkg-config --cflags --libs ${
+            concatMapStringsSep " " escapeShellArg (attrNames libraries)
+          })"
+        } \
+        -O \
+        -o "$exe" \
+        -Wall \
+        -x c \
+        "$textPath"
     strip --strip-unneeded "$exe"
   '';
 
