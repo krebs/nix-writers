@@ -125,12 +125,11 @@ pkgs: oldpkgs: {
     inherit text;
     passAsFile = [ "text" ];
   } /* sh */ ''
-    PATH=${makeBinPath (with pkgs; [
-      # TODO remove if everyone migrated to 18.03
-      (if hasAttr "binutils-unwrapped" pkgs then binutils-unwrapped else binutils)
-      coreutils
-      gcc
-    ])}
+    PATH=${makeBinPath [
+      pkgs.binutils-unwrapped
+      pkgs.coreutils
+      pkgs.gcc
+    ]}
     exe=$out${destination}
     mkdir -p "$(dirname "$exe")"
     gcc -O -Wall -o "$exe" -x c "$textPath"
