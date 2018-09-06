@@ -169,12 +169,12 @@ pkgs: oldpkgs: {
     mv "$textPath" $out
   '';
 
-  writeHaskell = name: extra-deps: text:
+  writeHaskell = name: extra-depends: text:
     pkgs.stdenv.mkDerivation {
       inherit name;
       src = pkgs.writeHaskellPackage name {
         executables.${name} = {
-          inherit extra-deps;
+          inherit extra-depends;
           text = text;
         };
       };
