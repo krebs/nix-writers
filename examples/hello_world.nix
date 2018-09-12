@@ -18,6 +18,9 @@ in {
     main = do
       putStrLn "hello world"
   '';
+  perl = pkgs.writePerl "hello-world" {} ''
+    print "hello world\n";
+  '';
   python2 = pkgs.writePython2 "hello-world" {} ''
     print "hello world"
   '';

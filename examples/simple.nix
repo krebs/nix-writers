@@ -14,6 +14,10 @@ in {
     main :: IO ()
     main = print Rolf
   '';
+  perl = pkgs.writePerl "simple.pl" { deps = [ pkgs.perlPackages.boolean ]; } ''
+    use boolean;
+    print "Howdy!\n" if true;
+  '';
   python2 = pkgs.writePython2 "hello-world" { deps = [ pkgs.python2Packages.pyyaml ]; } ''
     import yaml
 

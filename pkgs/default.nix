@@ -313,6 +313,23 @@ pkgs: oldpkgs: {
       ${pkgs.cabal2nix}/bin/cabal2nix ${path} > $out
     '');
 
+  writePerl = name: { deps ? [] }:
+  let
+    perl-env = pkgs.buildEnv {
+      name = "perl-environment";
+      paths = deps;
+      pathsToLink = [
+        "/lib/perl5/site_perl"
+      ];
+    };
+  in
+  pkgs.makeScriptWriter {
+    interpreter = "${pkgs.perl}/bin/perl -I ${perl-env}/lib/perl5/site_perl";
+  } name;
+
+  writePerlBin = name:
+    pkgs.writePerl "/bin/${name}";
+
   writePython2 = name: { deps ? [], flakeIgnore ? [] }:
   let
     py = pkgs.python2.withPackages (ps: deps);
