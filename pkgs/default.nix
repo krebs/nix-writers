@@ -1,7 +1,7 @@
 with import ../lib;
 
 pkgs: oldpkgs: {
-  execve = name: { filename, argv ? null, envp ? {}, destination ? "" }:
+  exec = name: { filename, argv ? null, envp ? null, destination ? "" }:
     pkgs.writeC name { inherit destination; } /* c */ ''
       #include <unistd.h>
 
@@ -16,18 +16,24 @@ pkgs: oldpkgs: {
           static char *const argv[] = ${toC (argv ++ [null])};
         ''}
 
-      static char *const envp[] = ${toC (
-        mapAttrsToList (k: v: "${k}=${v}") envp ++ [null]
-      )};
+      ${optionalString (envp != null) /* c */ ''
+        static char *const envp[] = ${toC (
+          mapAttrsToList (k: v: "${k}=${v}") envp ++ [null]
+        )};
+      ''}
 
       int main (MAIN_ARGS) {
-        execve(filename, argv, envp);
+        ${if envp == null then /* c */ ''
+          execv(filename, argv);
+        '' else /* c */ ''
+          execve(filename, argv, envp);
+        ''}
         return -1;
       }
     '';
 
-  execveBin = name: cfg:
-    pkgs.execve name (cfg // { destination = "/bin/${name}"; });
+  execBin = name: cfg:
+    pkgs.exec name (cfg // { destination = "/bin/${name}"; });
 
   makeScriptWriter = { interpreter, check ? null }: name: text:
     assert (with types; either absolute-pathname filename).check name;
