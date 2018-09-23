@@ -18,6 +18,9 @@ in {
     main = do
       putStrLn "hello world"
   '';
+  js = pkgs.writeJS "hello-world" {} ''
+    console.log("hello world")
+  '';
   perl = pkgs.writePerl "hello-world" {} ''
     print "hello world\n";
   '';

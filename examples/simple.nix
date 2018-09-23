@@ -14,6 +14,12 @@ in {
     main :: IO ()
     main = print Rolf
   '';
+  js = pkgs.writeJS "example-js" { deps = [ pkgs.nodePackages.uglify-js ]; } ''
+    var UglifyJS = require("uglify-js");
+    var code = "function add(first, second) { return first + second; }";
+    var result = UglifyJS.minify(code);
+    console.log(result.code);
+  '';
   perl = pkgs.writePerl "simple.pl" { deps = [ pkgs.perlPackages.boolean ]; } ''
     use boolean;
     print "Howdy!\n" if true;

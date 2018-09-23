@@ -18,6 +18,7 @@ in
     bash = writeTest "bash features" simples.bash;
     dash = writeTest "dash features" simples.dash;
     haskell = writeTest "Rolf" simples.haskell;
+    js = writeTest "function add(n,d){return n+d}" simples.js;
     perl = writeTest "Howdy!" simples.perl;
     python2 = writeTest "['some', 'random', 'variables']" simples.python2;
     python3 = writeTest "['some', 'random', 'variables']" simples.python3;

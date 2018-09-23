@@ -297,6 +297,23 @@ pkgs: oldpkgs: {
       };
     };
 
+  writeJS = name: { deps ? [] }: text:
+  let
+    node-env = pkgs.buildEnv {
+      name = "node";
+      paths = deps;
+      pathsToLink = [
+        "/lib/node_modules"
+      ];
+    };
+  in pkgs.writeDash name ''
+    export NODE_PATH=${node-env}/lib/node_modules
+    exec ${pkgs.nodejs}/bin/node ${pkgs.writeText "js" text}
+  '';
+
+  writeJSBin = name:
+    pkgs.writeJS "/bin/${name}";
+
   writeJSON = name: value: pkgs.runCommand name {
     json = toJSON value;
     passAsFile = [ "json" ];
