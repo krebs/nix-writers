@@ -1,14 +1,14 @@
 let
   pkgs = import <nixpkgs> { overlays = [ (import ../pkgs) ]; };
 in {
-  bash = pkgs.writeBash "hello-world" ''
+  bash = pkgs.writeBash "simple.sh" ''
    if [[ "test" == "test" ]]; then echo "bash features"; fi
   '';
   # cc -L/nix/store/...blah/lib -I/nix/store/...blah/include
-  dash = pkgs.writeDash "hello-world" ''
+  dash = pkgs.writeDash "simple" ''
    test '~' = '~' && echo 'dash features'
   '';
-  haskell = pkgs.writeHaskell "hello-world" [ "acme-cuteboy" ] ''
+  haskell = pkgs.writeHaskell "simple" [ "acme-cuteboy" ] ''
     import Acme.CuteBoy
 
     main :: IO ()
@@ -18,7 +18,7 @@ in {
     use boolean;
     print "Howdy!\n" if true;
   '';
-  python2 = pkgs.writePython2 "hello-world" { deps = [ pkgs.python2Packages.pyyaml ]; } ''
+  python2 = pkgs.writePython2 "simple.py" { deps = [ pkgs.python2Packages.pyyaml ]; } ''
     import yaml
 
     print yaml.load("""
@@ -27,7 +27,7 @@ in {
       - variables
     """)
   '';
-  python3 = pkgs.writePython3 "hello-world" { deps = [ pkgs.python3Packages.pyyaml ]; } ''
+  python3 = pkgs.writePython3 "simple.py" { deps = [ pkgs.python3Packages.pyyaml ]; } ''
     import yaml
 
     print(yaml.load("""
