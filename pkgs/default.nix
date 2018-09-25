@@ -303,6 +303,23 @@ pkgs: oldpkgs: {
       };
     };
 
+  writeJS = name: { deps ? [] }: text:
+  let
+    node-env = pkgs.buildEnv {
+      name = "node";
+      paths = deps;
+      pathsToLink = [
+        "/lib/node_modules"
+      ];
+    };
+  in pkgs.writeDash name ''
+    export NODE_PATH=${node-env}/lib/node_modules
+    exec ${pkgs.nodejs}/bin/node ${pkgs.writeText "js" text}
+  '';
+
+  writeJSBin = name:
+    pkgs.writeJS "/bin/${name}";
+
   writeJSON = name: value: pkgs.runCommand name {
     json = toJSON value;
     passAsFile = [ "json" ];
@@ -318,6 +335,23 @@ pkgs: oldpkgs: {
     (name: path: pkgs.runCommand name {} /* sh */ ''
       ${pkgs.cabal2nix}/bin/cabal2nix ${path} > $out
     '');
+
+  writePerl = name: { deps ? [] }:
+  let
+    perl-env = pkgs.buildEnv {
+      name = "perl-environment";
+      paths = deps;
+      pathsToLink = [
+        "/lib/perl5/site_perl"
+      ];
+    };
+  in
+  pkgs.makeScriptWriter {
+    interpreter = "${pkgs.perl}/bin/perl -I ${perl-env}/lib/perl5/site_perl";
+  } name;
+
+  writePerlBin = name:
+    pkgs.writePerl "/bin/${name}";
 
   writePython2 = name: { deps ? [], flakeIgnore ? [] }:
   let
