@@ -33,17 +33,23 @@ once you've included the nix-writers as overlay you can use the scripts to creat
   environment.systemPackages = with pkgs; [
 
     # Haskell example
-    (writeHaskell "nix-writers-example-haskell" {
-      executables."nix-writers-example-haskell".text = ''main = print "this is a writeHaskell example"'';
+    (writeHaskellPackage "nix-writers-example-haskell" {
+      executables."nix-writers-example-haskell".text = ''
+        main = print "this is a writeHaskell example"
+      '';
     })
 
     # C example
     (writeC "nix-writers-example-c" {
       destination = "/bin/nix-writers-example-c";
-    } ''int main() { printf("this is a writeC example!\n"); }'')
+    } ''
+      int main() { printf("this is a writeC example!\n"); }
+    '')
 
     # Dash example
-    (writeDashBin "nix-writers-example-dash" ''echo "this is a writeDash example!"'')
+    (writeDashBin "nix-writers-example-dash" ''
+      echo "this is a writeDash example!"
+    '')
 
   ];
 ```
