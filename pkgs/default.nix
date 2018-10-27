@@ -54,6 +54,14 @@ pkgs: oldpkgs: {
   execBin = name: cfg:
     pkgs.exec name (cfg // { destination = "/bin/${name}"; });
 
+  /* Base implementation for non-compiled executables.
+     Takes an interpreter, for example `${pkgs.bash}/bin/bash`
+
+     Examples:
+       writebash = makeScriptWriter { interpreter = "${pkgs.bash}/bin/bash"; }
+       makeScriptWriter { interpreter = "${pkgs.dash}/bin/dash"; } "hello" "echo hello world"
+  */
+
   makeScriptWriter = { interpreter, check ? null }: name: text:
     assert (with types; either absolute-pathname filename).check name;
     pkgs.write (baseNameOf name) {
@@ -64,6 +72,22 @@ pkgs: oldpkgs: {
       };
     };
 
+  /* Take a name and specification and build a derivation out of it
+     Examples:
+       write "name" { "/etc/test" = { text = "hello world"; }; }
+
+       write "name" { "" = { executable = true; text = "echo hello world"; }; }
+
+       write "name" { "/bin/test" = { executable = true; text = "echo hello world"; }; }
+
+       write "name" { "" = { executable = true;
+         check = "${pkgs.shellcheck}/bin/shellcheck";
+         text = ''
+           #!/bin/sh
+           echo hello world
+         '';
+       }; }
+  */
   write = name: specs0:
   let
     env = filevars // { passAsFile = attrNames filevars; };
@@ -133,6 +157,13 @@ pkgs: oldpkgs: {
       )
     '';
 
+  /* Like writeScript but the first line is a shebang to bash
+
+     Example:
+       writeBash "example" ''
+         echo hello world
+       ''
+  */
   writeBash = name: text:
     assert (with types; either absolute-pathname filename).check name;
     pkgs.write (baseNameOf name) {
