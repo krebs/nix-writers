@@ -164,14 +164,9 @@ pkgs: oldpkgs: {
          echo hello world
        ''
   */
-  writeBash = name: text:
-    assert (with types; either absolute-pathname filename).check name;
-    pkgs.write (baseNameOf name) {
-      ${optionalString (types.absolute-pathname.check name) name} = {
-        executable = true;
-        text = "#! ${pkgs.bash}/bin/bash\n${text}";
-      };
-    };
+  writeBash = pkgs.makeScriptWriter {
+    interpreter = "${pkgs.bash}/bin/bash";
+  };
 
   writeBashBin = name:
     assert types.filename.check name;
