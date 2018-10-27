@@ -1,5 +1,24 @@
 with import ../lib;
 
+/* Collection of nix-writers.
+ *
+ * Purpose: Use your favourite language to generate
+ * an executable and package it in nix.
+ *
+ * How to use it: Every nix-writer has the form:
+ * writeLang "Name-of-exec" ''
+ *     source code in <Lang>
+ * ''
+ *
+ * If the source code compiles in <Lang>,
+ * nix will generate an executable /nix/store/<SHA>-<Name-of-exec>
+ *
+ * Getting started:
+ *
+ * Switch into the example directory and call
+ * nix-build hello_world.nix.
+ */
+
 pkgs: oldpkgs: {
   exec = name: { filename, argv ? null, envp ? null, destination ? "" }:
     pkgs.writeC name { inherit destination; } /* c */ ''
