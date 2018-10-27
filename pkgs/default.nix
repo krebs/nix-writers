@@ -219,6 +219,12 @@ pkgs: oldpkgs: {
     strip --strip-unneeded "$exe"
   '';
 
+  # Like writeScript but the first line is a shebang to dash
+  #
+  # Example:
+  #   writeDash "example" ''
+  #     echo hello world
+  #   ''
   writeDash = pkgs.makeScriptWriter {
     interpreter = "${pkgs.dash}/bin/dash";
   };
