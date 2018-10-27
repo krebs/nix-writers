@@ -60,7 +60,6 @@ pkgs: oldpkgs: {
   # Examples:
   #   writebash = makeScriptWriter { interpreter = "${pkgs.bash}/bin/bash"; }
   #   makeScriptWriter { interpreter = "${pkgs.dash}/bin/dash"; } "hello" "echo hello world"
-  #
   makeScriptWriter = { interpreter, check ? null }: name: text:
     assert (with types; either absolute-pathname filename).check name;
     pkgs.write (baseNameOf name) {
@@ -71,7 +70,7 @@ pkgs: oldpkgs: {
       };
     };
 
-  # Take a name and specification and build a derivation out of it
+  # write takes a name and specification and build a derivation out of it
   # Examples:
   #   write "name" { "/etc/test" = { text = "hello world"; }; }
   #
@@ -89,7 +88,6 @@ pkgs: oldpkgs: {
   #       '';
   #     };
   #   }
-  #
   write = name: specs0:
   let
     env = filevars // { passAsFile = attrNames filevars; };
@@ -165,7 +163,6 @@ pkgs: oldpkgs: {
   #   writeBash "example" ''
   #     echo hello world
   #   ''
-  #
   writeBash = pkgs.makeScriptWriter {
     interpreter = "${pkgs.bash}/bin/bash";
   };
@@ -174,6 +171,24 @@ pkgs: oldpkgs: {
     assert types.filename.check name;
     pkgs.writeBash "/bin/${name}";
 
+  # writeC writes an executable c package called `name'
+  #  to `destination' using `library'.
+  #
+  #  Example:
+  #    c = pkgs.writeC "hello-world-ncurses" { libraries = {ncurses = pkgs.ncurses;}; } ''
+  #      #include <ncurses.h>
+  #
+  #      int main()
+  #      {
+  #        initscr();			
+  #        printw("Hello World !!!");	
+  #        refresh();			
+  #        getch();			
+  #        endwin();			
+  #
+  #        return 0;
+  #      }
+  #    '';
   writeC = name: {
     destination ? "",
     libraries ? {}
