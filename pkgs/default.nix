@@ -1,23 +1,23 @@
-with import ../lib;
+# Collection of nix-writers.
+#
+# Purpose: Use your favourite language to generate
+# an executable and package it in nix.
+#
+# How to use it: Every nix-writer has the form:
+# writeLang "Name-of-exec" ''
+#   source code in <Lang>
+# ''
+#
+# If the source code compiles in <Lang>,
+# nix will generate an executable /nix/store/<SHA>-<Name-of-exec>
+#
+# Getting started:
+#
+# Switch into the example directory and call
+# nix-build hello_world.nix.
+#
 
-/* Collection of nix-writers.
- *
- * Purpose: Use your favourite language to generate
- * an executable and package it in nix.
- *
- * How to use it: Every nix-writer has the form:
- * writeLang "Name-of-exec" ''
- *     source code in <Lang>
- * ''
- *
- * If the source code compiles in <Lang>,
- * nix will generate an executable /nix/store/<SHA>-<Name-of-exec>
- *
- * Getting started:
- *
- * Switch into the example directory and call
- * nix-build hello_world.nix.
- */
+with import ../lib;
 
 pkgs: oldpkgs: {
   exec = name: { filename, argv ? null, envp ? null, destination ? "" }:
@@ -54,14 +54,13 @@ pkgs: oldpkgs: {
   execBin = name: cfg:
     pkgs.exec name (cfg // { destination = "/bin/${name}"; });
 
-  /* Base implementation for non-compiled executables.
-     Takes an interpreter, for example `${pkgs.bash}/bin/bash`
-
-     Examples:
-       writebash = makeScriptWriter { interpreter = "${pkgs.bash}/bin/bash"; }
-       makeScriptWriter { interpreter = "${pkgs.dash}/bin/dash"; } "hello" "echo hello world"
-  */
-
+  # Base implementation for non-compiled executables.
+  # Takes an interpreter, for example `${pkgs.bash}/bin/bash`
+  #
+  # Examples:
+  #   writebash = makeScriptWriter { interpreter = "${pkgs.bash}/bin/bash"; }
+  #   makeScriptWriter { interpreter = "${pkgs.dash}/bin/dash"; } "hello" "echo hello world"
+  #
   makeScriptWriter = { interpreter, check ? null }: name: text:
     assert (with types; either absolute-pathname filename).check name;
     pkgs.write (baseNameOf name) {
@@ -72,22 +71,25 @@ pkgs: oldpkgs: {
       };
     };
 
-  /* Take a name and specification and build a derivation out of it
-     Examples:
-       write "name" { "/etc/test" = { text = "hello world"; }; }
-
-       write "name" { "" = { executable = true; text = "echo hello world"; }; }
-
-       write "name" { "/bin/test" = { executable = true; text = "echo hello world"; }; }
-
-       write "name" { "" = { executable = true;
-         check = "${pkgs.shellcheck}/bin/shellcheck";
-         text = ''
-           #!/bin/sh
-           echo hello world
-         '';
-       }; }
-  */
+  # Take a name and specification and build a derivation out of it
+  # Examples:
+  #   write "name" { "/etc/test" = { text = "hello world"; }; }
+  #
+  #   write "name" { "" = { executable = true; text = "echo hello world"; }; }
+  #
+  #   write "name" { "/bin/test" = { executable = true; text = "echo hello world"; }; }
+  #
+  #   write "name" {
+  #     "" = {
+  #       executable = true;
+  #       check = "${pkgs.shellcheck}/bin/shellcheck";
+  #       text = ''
+  #         #!/bin/sh
+  #         echo hello world
+  #       '';
+  #     };
+  #   }
+  #
   write = name: specs0:
   let
     env = filevars // { passAsFile = attrNames filevars; };
@@ -157,13 +159,13 @@ pkgs: oldpkgs: {
       )
     '';
 
-  /* Like writeScript but the first line is a shebang to bash
-
-     Example:
-       writeBash "example" ''
-         echo hello world
-       ''
-  */
+  # Like writeScript but the first line is a shebang to bash
+  #
+  # Example:
+  #   writeBash "example" ''
+  #     echo hello world
+  #   ''
+  #
   writeBash = pkgs.makeScriptWriter {
     interpreter = "${pkgs.bash}/bin/bash";
   };
