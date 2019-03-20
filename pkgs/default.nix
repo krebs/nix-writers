@@ -395,6 +395,15 @@ pkgs: oldpkgs: {
     ${pkgs.jq}/bin/jq . "$jsonPath" > "$out"
   '';
 
+  writeNginxConfig = name: text: pkgs.runCommand name {
+    inherit text;
+    passAsFile = [ "text" ];
+  } /* sh */ ''
+    cp "$textPath" $out
+    ${pkgs.nginx-config-formatter}/bin/nginxfmt $out
+    ${pkgs.gixy}/bin/gixy $out
+  '';
+
   writeNixFromCabal =
     trace (toString [
       "The function `writeNixFromCabal` has been deprecated in favour of"
