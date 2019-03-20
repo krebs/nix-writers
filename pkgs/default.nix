@@ -403,6 +403,7 @@ pkgs: oldpkgs: {
   } /* sh */ ''
     cp "$textPath" $out
     ${pkgs.nginx-config-formatter}/bin/nginxfmt $out
+    ${pkgs.gnused}/bin/sed -i '/^$/d' $out
     ${pkgs.gixy}/bin/gixy $out
   '';
 
