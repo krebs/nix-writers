@@ -200,12 +200,12 @@ pkgs: oldpkgs: {
     PATH=${makeBinPath [
       pkgs.binutils-unwrapped
       pkgs.coreutils
-      pkgs.gcc
       pkgs.pkgconfig
+      pkgs.stdenv.cc
     ]}
     exe=$out${destination}
     mkdir -p "$(dirname "$exe")"
-    gcc \
+    cc \
         ${optionalString (libraries != [])
           /* sh */ "$(pkg-config --cflags --libs ${
             concatMapStringsSep " " escapeShellArg (attrNames libraries)
@@ -216,7 +216,9 @@ pkgs: oldpkgs: {
         -Wall \
         -x c \
         "$textPath"
-    strip --strip-unneeded "$exe"
+    ${optionalString (!pkgs.stdenv.hostPlatform.isDarwin) /* sh */ ''
+      strip --strip-unneeded "$exe"
+    ''}
   '';
 
   # Like writeScript but the first line is a shebang to dash
